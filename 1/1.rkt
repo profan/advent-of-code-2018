@@ -14,8 +14,7 @@
         (cond 
           [(and (set-member? fs new-freq) (not (member new-freq ds))) 
            (append ds (list new-freq))]
-          [else 
-           ds]))
+          [else ds]))
       (list new-freq new-freq-set new-freq-doubles))
     init-state input))
 
