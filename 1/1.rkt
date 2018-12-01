@@ -8,13 +8,8 @@
       (define total (first acc-v))
       (define fs (second acc-v))
       (define ds (third acc-v))
-      (define new-freq 
-        (+ total 
-           (match (substring e 0 1)
-             ["+" (string->number (substring e 1))]
-             ["-" (- (string->number (substring e 1)))])))
-      (define new-freq-set
-        (set-add fs new-freq))
+      (define new-freq (+ total (string->number e)))
+      (define new-freq-set (set-add fs new-freq))
       (define new-freq-doubles
         (cond 
           [(and (set-member? fs new-freq) (not (member new-freq ds))) 
