@@ -10,11 +10,9 @@
       (define ds (third acc-v))
       (define new-freq 
         (+ total 
-           (cond
-             [(non-empty-string? e)
-              (match (substring e 0 1)
-                ["+" (string->number (substring e 1))]
-                ["-" (- (string->number (substring e 1)))])])))
+           (match (substring e 0 1)
+             ["+" (string->number (substring e 1))]
+             ["-" (- (string->number (substring e 1)))])))
       (define new-freq-set
         (set-add fs new-freq))
       (define new-freq-doubles
