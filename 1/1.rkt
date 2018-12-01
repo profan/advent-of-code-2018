@@ -21,7 +21,7 @@
     (calc-frequency lines state))
   (cond
     [(empty? cur-doubles) (calc-until-has-duplicate lines new-state)]
-    [else (list cur-freq cur-freq-set cur-doubles)]))
+    [else new-state]))
 
 (match-define (list final-freq final-freq-set final-doubles)
   (call-with-input-file "input.txt"
