@@ -5,9 +5,7 @@
 (define (calc-frequency input init-state)
   (sequence-fold 
     (lambda (acc-v e)
-      (define total (first acc-v))
-      (define fs (second acc-v))
-      (define ds (third acc-v))
+      (match-define (list total fs ds) acc-v)
       (define new-freq (+ total (string->number e)))
       (define new-freq-set (set-add fs new-freq))
       (define new-freq-doubles
