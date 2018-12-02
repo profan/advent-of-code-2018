@@ -40,7 +40,7 @@
                           (define correct-box-ids
                             (for*/set ([e1 lines]
                                        [e2 lines]
-                                       #:when (and (not (eqv? e1 e2)) (= 1 (calc-delta e1 e2))))
+                                       #:when (= 1 (calc-delta e1 e2)))
                                       (cut-delta e1 e2)))
                           (list checksum correct-box-ids))))
 
