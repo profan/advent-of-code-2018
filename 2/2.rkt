@@ -8,12 +8,15 @@
       [else (h c 1)])))
 
 (define (calc-delta s1 s2)
-  (for/sum ([c1 (in-string s1)] [c2 (in-string s2)])
-            (if (eqv? c1 c2) 0 1)))
+  (for/sum ([c1 (in-string s1)]
+            [c2 (in-string s2)])
+    (if (eqv? c1 c2) 0 1)))
 
 (define (cut-delta s1 s2)
   (list->string 
-    (for/list ([c1 (in-string s1)] [c2 (in-string s2)] #:when (eqv? c1 c2)) c1)))
+    (for/list ([c1 (in-string s1)]
+               [c2 (in-string s2)]
+               #:when (eqv? c1 c2)) c1)))
 
 ; expand our dict literals to hashes
 (current-curly-dict hash)
