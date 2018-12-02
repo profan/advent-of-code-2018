@@ -39,9 +39,9 @@
                           ; part 2 - 2
                           (define correct-box-ids
                             (for*/first ([e1 lines]
-                                        [e2 lines]
-                                        #:when (= 1 (calc-delta e1 e2)))
-                                       (cut-delta e1 e2)))
+                                         [e2 lines]
+                                         #:when (= 1 (calc-delta e1 e2)))
+                                        (cut-delta e1 e2)))
                           (list checksum correct-box-ids))))
 
 result
