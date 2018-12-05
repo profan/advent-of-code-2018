@@ -11,7 +11,7 @@
       (define new-freq-doubles
         (cond 
           [(and (set-member? fs new-freq) (not (member new-freq ds))) 
-           (append ds (list new-freq))]
+           (cons new-freq ds)]
           [else ds]))
       (list new-freq new-freq-set new-freq-doubles))
     init-state input))
@@ -29,4 +29,4 @@
                           (define lines (port->lines in))
                           (calc-until-has-duplicate lines))))
 
-(displayln (format "final freq: ~a~nfirst double: ~a" final-freq (first final-doubles)))
+(displayln (format "final freq: ~a~nfirst double: ~a" final-freq (last final-doubles)))
