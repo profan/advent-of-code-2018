@@ -23,11 +23,11 @@
                       (define sorted-entries
                         (sort 
                           (for/list ([l lines])
-                            (match-define (list _ year month day hour minute rst)
-                              (regexp-match date-rgx l))
-                            (define timestamp
-                              (datetime (s->n year) (s->n month) (s->n day) (s->n hour) (s->n minute)))
-                            (cons timestamp rst))
+                            (match-let ([(list _ year month day hour minute rst)
+                                         (regexp-match date-rgx l)])
+                              (define timestamp
+                                (datetime (s->n year) (s->n month) (s->n day) (s->n hour) (s->n minute)))
+                              (cons timestamp rst)))
                           (lambda (e1 e2) (datetime<? (car e1) (car e2)))))
                       (match-define (list guard-sleep-times guard-sleep-windows)
                         (for/fold ([cur-guard-id #f]
