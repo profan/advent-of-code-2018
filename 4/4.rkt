@@ -15,6 +15,7 @@
 (call-with-input-file "input.txt"
                      (lambda (in)
                       (define lines (port->lines in))
+                      ; part 4 - 1
                       (define sorted-entries
                         (sort 
                           (for/list ([l lines])
@@ -60,11 +61,25 @@
                       (define-values (sleepiest-guard-id sleepiest-guard-time)
                         (for/fold ([max-id #f] [max-so-far 0]) ([(k v) guard-sleep-times])
                           (if (> v max-so-far) (values k v) (values max-id max-so-far))))
-                      (define sleepiest-minute
-                        (for/fold ([max-min #f] [max-val 0] #:result max-min) ([(k v) (guard-sleep-windows sleepiest-guard-id)])
+                      (define (key-for-max-value h)
+                        (for/fold ([max-min #f] [max-val 0] #:result max-min) ([(k v) h])
                           (if (> v max-val) (values k v) (values max-min max-val))))
+                      (define sleepiest-minute
+                        (key-for-max-value (guard-sleep-windows sleepiest-guard-id)))
+                      ; part 4 - 2
+                      (define-values (most-asleep-on-same-minute times-asleep most-which-minute)
+                        (for/fold ([max-id #f] [max-min 0] [max-val 0])
+                          ([(cur-guard-id sh) guard-sleep-windows])
+                          (define most-slept-minute (key-for-max-value sh))
+                          (if (and (number? most-slept-minute) (> (sh most-slept-minute) max-val))
+                            (values cur-guard-id most-slept-minute (sh most-slept-minute))
+                            (values max-id max-min max-val))))
                       (displayln
-                        (str "Sleepiest Guard is #" sleepiest-guard-id
+                        (str "[Strategy 1] Sleepiest Guard is #" sleepiest-guard-id
                              ", they slept: " sleepiest-guard-time " minutes"
                              ", their sleepiest minute was: " sleepiest-minute
-                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)))))
+                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)))
+                      (displayln
+                        (str "[Strategy 2] Guard most asleep on the same minute is: #" most-asleep-on-same-minute
+                             " with minute: " most-which-minute " (" times-asleep " times)"
+                             "\n - Result: ID * " most-which-minute " = " (* (s->n most-asleep-on-same-minute) most-which-minute)))))
