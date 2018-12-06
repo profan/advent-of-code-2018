@@ -36,30 +36,33 @@
                                (list cur-guard-id 
                                      (+ (h cur-guard-id) (minutes-between last-stamp cur-time))
                                      (let ([hour-diff (hours-between last-stamp cur-time)])
-                                       (for/list ([i (in-range (+ hour-diff 1))])
-                                         (cond 
-                                           [(and (= i 0) (= hour-diff 0))
-                                            (make-range (->minutes last-stamp) (->minutes cur-time))]
-                                           [(= i 0)
-                                            (make-range (->minutes last-stamp) 59)]
-                                           [else
-                                            (make-range 0 (if (= i hour-diff)
-                                                            (->minutes cur-time)
-                                                            59))]))))]))
+                                       (for/fold ([rs (make-range)])
+                                          ([s (for/list ([i (in-range (+ hour-diff 1))])
+                                                (cond 
+                                                  [(and (= i 0) (= hour-diff 0))
+                                                   (make-range (->minutes last-stamp) (->minutes cur-time))]
+                                                  [(= i 0)
+                                                   (make-range (->minutes last-stamp) 59)]
+                                                  [else
+                                                   (make-range 0 (if (= i hour-diff)
+                                                                   (->minutes cur-time)
+                                                            59))]))])
+                                          (union rs s))))]))
                           (values guard-id cur-time
-                                  (sh guard-id (cons minutes-asleep (sh guard-id #:else '())))
+                                  (sh guard-id (if (sh guard-id) (cons minutes-asleep (sh guard-id)) minutes-asleep))
                                   (h guard-id time-asleep))))
                       (define sleepiest-guard
                         (for/fold ([max-id #f] [max-so-far 0] #:result max-id) ([(k v) guard-sleep-times])
                           (if (> v max-so-far) (values k v) (values max-id max-so-far))))
                       (displayln sleepiest-guard)
+                      (displayln (length (guard-sleep-windows sleepiest-guard)))
                       (define sleepiest-minutes
                         (for*/fold ([cur-max-set #f]
                                     [cur-max-overlaps 0]
                                     [cur-set-overlaps 0]
                                     #:result cur-max-set)
-                          ([s1 (flatten (guard-sleep-windows sleepiest-guard))]
-                           [s2 (flatten (guard-sleep-windows sleepiest-guard))]
+                          ([s1 (guard-sleep-windows sleepiest-guard)]
+                           [s2 (guard-sleep-windows sleepiest-guard)]
                            #:when (not (eq? s1 s2)))
                           (define new-set-overlaps
                             (if (eq? cur-max-set s1)
