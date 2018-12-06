@@ -2,7 +2,7 @@
 
 (require racket/set)
 
-(define (calc-frequency input init-state)
+(define (calc-frequency input [init-state (list 0 (set) '())])
   (sequence-fold 
     (lambda (acc-v e)
       (match-define (list total fs ds) acc-v)
@@ -23,10 +23,12 @@
     [(empty? cur-doubles) (calc-until-has-duplicate lines new-state)]
     [else new-state]))
 
-(match-define (list final-freq final-freq-set final-doubles)
+(match-define (list first-freq final-freq final-freq-set final-doubles)
   (call-with-input-file "input.txt"
                         (lambda (in)
                           (define lines (port->lines in))
-                          (calc-until-has-duplicate lines))))
+                          (cons 
+                            (first (calc-frequency lines))
+                            (calc-until-has-duplicate lines)))))
 
-(displayln (format "final freq: ~a~nfirst double: ~a" final-freq (last final-doubles)))
+(displayln (format "[1-1]: first freq: ~a~n[1-2]: final freq: ~a, first double: ~a" first-freq final-freq (last final-doubles)))
