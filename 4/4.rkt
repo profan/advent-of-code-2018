@@ -68,7 +68,7 @@
                       (define sleepiest-minute
                         (key-for-max-value (guard-sleep-windows sleepiest-guard-id)))
                       ; part 4 - 2
-                      (define-values (most-asleep-on-same-minute times-asleep most-which-minute)
+                      (define-values (most-asleep-on-same-minute most-which-minute times-asleep)
                         (for/fold ([max-id #f] [max-min 0] [max-val 0])
                           ([(cur-guard-id sh) guard-sleep-windows] #:when (not (hash-empty? sh)))
                           (define most-slept-minute (key-for-max-value sh))
