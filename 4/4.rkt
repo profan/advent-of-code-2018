@@ -60,7 +60,6 @@
                       (define-values (sleepiest-guard-id sleepiest-guard-time)
                         (for/fold ([max-id #f] [max-so-far 0]) ([(k v) guard-sleep-times])
                           (if (> v max-so-far) (values k v) (values max-id max-so-far))))
-                      
                       (define sleepiest-minute
                         (for/fold ([max-min #f] [max-val 0] #:result max-min) ([(k v) (guard-sleep-windows sleepiest-guard-id)])
                           (if (> v max-val) (values k v) (values max-min max-val))))
