@@ -7,6 +7,10 @@
 (define guard-begin-rgx #px"Guard #(\\d+)")
 (define (s->n s) (string->number s))
 
+(define (key-for-max-value h)
+  (for/fold ([max-key #f] [max-val 0] #:result max-key) ([(k v) h])
+    (if (> v max-val) (values k v) (values max-key max-val))))
+
 (define (hash-range from to nv)
   (for/hash ([v (in-range from to)]) (values v nv)))
 
@@ -61,9 +65,6 @@
                       (define-values (sleepiest-guard-id sleepiest-guard-time)
                         (for/fold ([max-id #f] [max-so-far 0]) ([(k v) guard-sleep-times])
                           (if (> v max-so-far) (values k v) (values max-id max-so-far))))
-                      (define (key-for-max-value h)
-                        (for/fold ([max-min #f] [max-val 0] #:result max-min) ([(k v) h])
-                          (if (> v max-val) (values k v) (values max-min max-val))))
                       (define sleepiest-minute
                         (key-for-max-value (guard-sleep-windows sleepiest-guard-id)))
                       ; part 4 - 2
