@@ -67,6 +67,11 @@
                          (values id (guard-sleep-times id))))
                       (define sleepiest-minute
                         (key-for-max-value (guard-sleep-windows sleepiest-guard-id)))
+                      (displayln
+                        (str "[Strategy 1] Sleepiest Guard is #" sleepiest-guard-id
+                             ", they slept: " sleepiest-guard-time " minutes"
+                             ", their sleepiest minute was: " sleepiest-minute
+                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)))
                       ; part 4 - 2
                       (define-values (most-asleep-on-same-minute most-which-minute times-asleep)
                         (for/fold ([max-id #f] [max-min 0] [max-val 0])
@@ -75,11 +80,6 @@
                           (if (> (sh most-slept-minute) max-val)
                             (values cur-guard-id most-slept-minute (sh most-slept-minute))
                             (values max-id max-min max-val))))
-                      (displayln
-                        (str "[Strategy 1] Sleepiest Guard is #" sleepiest-guard-id
-                             ", they slept: " sleepiest-guard-time " minutes"
-                             ", their sleepiest minute was: " sleepiest-minute
-                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)))
                       (displayln
                         (str "[Strategy 2] Guard most asleep on the same minute is: #" most-asleep-on-same-minute
                              " with minute: " most-which-minute " (" times-asleep " times)"
