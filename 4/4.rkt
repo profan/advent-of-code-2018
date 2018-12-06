@@ -67,5 +67,4 @@
                         (str "Sleepiest Guard is #" sleepiest-guard-id
                              ", they slept: " sleepiest-guard-time " minutes"
                              ", their sleepiest minute was: " sleepiest-minute
-                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)
-                             ))))
+                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)))))
