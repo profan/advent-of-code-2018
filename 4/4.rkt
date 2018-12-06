@@ -1,11 +1,16 @@
 #lang rackjure
 
 (require gregor)
-(require data/integer-set)
+(require racket/hash)
 
 (define date-rgx #px"\\[(\\d+)-(\\d+)-(\\d+) (\\d{2}):(\\d{2})\\]\\s*(.+)")
 (define guard-begin-rgx #px"Guard #(\\d+)")
 (define (s->n s) (string->number s))
+
+(define (hash-range from to nv)
+  (for/hash ([v (in-range from to)]) (values v nv)))
+
+(define (time-range from to) (hash-range from to 1))
 
 (call-with-input-file "input.txt"
                      (lambda (in)
@@ -29,48 +34,39 @@
                           (match-define (list guard-id time-asleep minutes-asleep)
                             (match rst
                               [(pregexp guard-begin-rgx (list _ id))
-                               (list id (h id #:else 0) (sh id #:else '()))]
+                               (list id (h id #:else 0) (sh id #:else (hash)))]
                               ["falls asleep"
                                (list cur-guard-id (h cur-guard-id) (sh cur-guard-id))]
                               ["wakes up"
                                (list cur-guard-id 
                                      (+ (h cur-guard-id) (minutes-between last-stamp cur-time))
                                      (let ([hour-diff (hours-between last-stamp cur-time)])
-                                       (for/fold ([rs (make-range)])
-                                          ([s (for/list ([i (in-range (+ hour-diff 1))])
-                                                (cond 
-                                                  [(and (= i 0) (= hour-diff 0))
-                                                   (make-range (->minutes last-stamp) (->minutes cur-time))]
-                                                  [(= i 0)
-                                                   (make-range (->minutes last-stamp) 59)]
-                                                  [else
-                                                   (make-range 0 (if (= i hour-diff)
-                                                                   (->minutes cur-time)
-                                                            59))]))])
-                                          (union rs s))))]))
+                                       (for/fold ([h (sh cur-guard-id)])
+                                         ([i (in-range (+ hour-diff 1))])
+                                         (define new-range 
+                                           (cond 
+                                             [(and (= i 0) (= hour-diff 0))
+                                              (time-range (->minutes last-stamp) (->minutes cur-time))]
+                                             [(= i 0)
+                                              (time-range (->minutes last-stamp) 59)]
+                                             [else
+                                              (time-range 0 (if (= i hour-diff)
+                                                              (->minutes cur-time)
+                                                              59))]))
+                                         (hash-union h new-range #:combine/key (lambda (k v1 v2) (+ v1 v2))))))]))
                           (values guard-id cur-time
-                                  (sh guard-id (if (sh guard-id) (cons minutes-asleep (sh guard-id)) minutes-asleep))
+                                  (sh guard-id minutes-asleep)
                                   (h guard-id time-asleep))))
-                      (define sleepiest-guard
-                        (for/fold ([max-id #f] [max-so-far 0] #:result max-id) ([(k v) guard-sleep-times])
+                      (define-values (sleepiest-guard-id sleepiest-guard-time)
+                        (for/fold ([max-id #f] [max-so-far 0]) ([(k v) guard-sleep-times])
                           (if (> v max-so-far) (values k v) (values max-id max-so-far))))
-                      (displayln sleepiest-guard)
-                      (displayln (length (guard-sleep-windows sleepiest-guard)))
-                      (define sleepiest-minutes
-                        (for*/fold ([cur-max-set #f]
-                                    [cur-max-overlaps 0]
-                                    [cur-set-overlaps 0]
-                                    #:result cur-max-set)
-                          ([s1 (guard-sleep-windows sleepiest-guard)]
-                           [s2 (guard-sleep-windows sleepiest-guard)]
-                           #:when (not (eq? s1 s2)))
-                          (define new-set-overlaps
-                            (if (eq? cur-max-set s1)
-                              (cond
-                                [(> (count (union s1 s2)) 0) (+ cur-set-overlaps 1)]
-                                [else cur-set-overlaps])
-                              (if (> (count (union s1 s2)) 0) 1 0)))
-                          (if (> new-set-overlaps cur-max-overlaps) 
-                            (values s1 new-set-overlaps new-set-overlaps)
-                            (values cur-max-set cur-max-overlaps new-set-overlaps))))
-                      guard-sleep-times))
+                      
+                      (define sleepiest-minute
+                        (for/fold ([max-min #f] [max-val 0] #:result max-min) ([(k v) (guard-sleep-windows sleepiest-guard-id)])
+                          (if (> v max-val) (values k v) (values max-min max-val))))
+                      (displayln
+                        (str "Sleepiest Guard is #" sleepiest-guard-id
+                             ", they slept: " sleepiest-guard-time " minutes"
+                             ", their sleepiest minute was: " sleepiest-minute
+                             "\n - Result: ID * " sleepiest-minute " = " (* (s->n sleepiest-guard-id) sleepiest-minute)
+                             ))))
