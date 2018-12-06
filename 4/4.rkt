@@ -63,8 +63,8 @@
                                   (sh guard-id minutes-asleep)
                                   (h guard-id time-asleep))))
                       (define-values (sleepiest-guard-id sleepiest-guard-time)
-                        (for/fold ([max-id #f] [max-so-far 0]) ([(k v) guard-sleep-times])
-                          (if (> v max-so-far) (values k v) (values max-id max-so-far))))
+                        (let ([id (key-for-max-value guard-sleep-times)])
+                         (values id (guard-sleep-times id))))
                       (define sleepiest-minute
                         (key-for-max-value (guard-sleep-windows sleepiest-guard-id)))
                       ; part 4 - 2
