@@ -13,8 +13,12 @@
     [(list c) (cons c result)]
     ['() result]))
 
-(call-with-input-file "test.txt"
+(call-with-input-file "input.txt"
                       (lambda (in)
                         (define input-chars (filter char-alphabetic? (port->list read-char in)))
-                        (define reaction (perform-reaction-pass input-chars))
-                        (length (perform-reaction-pass reaction))))
+                        (define fully-reacted-polymer
+                          (let repeat-until-same ([last-length 0] [cur-list input-chars])
+                           (define new-state (perform-reaction-pass cur-list))
+                           (define new-length (length new-state))
+                           (if (= new-length last-length) cur-list (repeat-until-same new-length new-state))))
+                        (length fully-reacted-polymer)))
