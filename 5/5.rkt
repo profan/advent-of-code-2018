@@ -13,12 +13,16 @@
     [(list c) (cons c result)]
     ['() result]))
 
+(define (fully-react-polymer reagents)
+  (let repeat-until-same ([last-length 0] [cur-list reagents])
+   (define new-state (perform-reaction-pass cur-list))
+   (define new-length (length new-state))
+   (cond
+     [(= new-length last-length) cur-list]
+     [else (repeat-until-same new-length new-state)])))
+
 (call-with-input-file "input.txt"
                       (lambda (in)
                         (define input-chars (filter char-alphabetic? (port->list read-char in)))
-                        (define fully-reacted-polymer
-                          (let repeat-until-same ([last-length 0] [cur-list input-chars])
-                           (define new-state (perform-reaction-pass cur-list))
-                           (define new-length (length new-state))
-                           (if (= new-length last-length) cur-list (repeat-until-same new-length new-state))))
+                        (define fully-reacted-polymer (fully-react-polymer input-chars))
                         (length fully-reacted-polymer)))
