@@ -21,8 +21,19 @@
      [(= new-length last-length) cur-list]
      [else (repeat-until-same new-length new-state)])))
 
+(define (minimize-polymer-length reagents)
+  (define types (for/set ([r reagents]) (char-downcase r)))
+  (for/fold ([min-size +inf.0] [shortest '()] #:result min-size) ([t types])
+    (define new-polymer (fully-react-polymer (filter (lambda (e) (not (eqv? (char-downcase e) t))) reagents)))
+    (define new-size (length new-polymer))
+    (if (< new-size min-size)
+      (values new-size new-polymer)
+      (values min-size shortest))))
+
 (call-with-input-file "input.txt"
                       (lambda (in)
                         (define input-chars (filter char-alphabetic? (port->list read-char in)))
                         (define fully-reacted-polymer (fully-react-polymer input-chars))
-                        (length fully-reacted-polymer)))
+                        (displayln (str "[5-1]: units remaining after first scan is: " (length fully-reacted-polymer)))
+                        (define minimized-polymer-size (minimize-polymer-length input-chars))
+                        (displayln (str "[5-2]: the shortest polymer that can be produced is: " minimized-polymer-size))))
